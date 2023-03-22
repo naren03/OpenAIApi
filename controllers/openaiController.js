@@ -6,6 +6,34 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+// Generate Response
+const generateResponse = async (req, res) => {
+	try {
+		const { prompt } = req.body;
+
+		const completion = await openai.createChatCompletion({
+			model: "gpt-3.5-turbo",
+			messages: [{ role: "user", content: prompt }],
+		});
+
+		console.log(completion.data.choices[0].message);
+		res
+			.status(200)
+			.json({ success: true, data: completion.data.choices[0].message });
+	} catch (error) {
+		if (error.response) {
+			console.log(error.response.status);
+			console.log(error.response.data);
+		} else {
+			console.log(error.message);
+		}
+
+		res.status(400).json({ success: false });
+	}
+};
+
+// Generate Image
+
 const generateImage = async (req, res) => {
 	try {
 		const { prompt, size } = req.body;
@@ -35,5 +63,4 @@ const generateImage = async (req, res) => {
 		res.status(400).json({ success: false });
 	}
 };
-
-module.exports = { generateImage };
+module.exports = { generateResponse, generateImage };
